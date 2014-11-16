@@ -32,14 +32,15 @@ byte[] redDotData = unserialized.getData();
 
 ## Maven
 ``` xml
-<repository>
-    <id>dataurl-mvn-repo</id>
-    <url>https://raw.github.com/maxschuster/DataUrl/mvn-repo/</url>
-    <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-    </snapshots>
-</repository>
+<repositories>
+    <repository>
+        <id>dataurl-mvn-repo</id>
+        <url>https://raw.github.com/maxschuster/DataUrl/mvn-repo/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
 </repositories>
 
 <dependencies>
