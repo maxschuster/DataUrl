@@ -302,7 +302,7 @@ public class DefaultDataUrlSerializer implements DataUrlSerializer {
          * supported
          */
         public static String encode(String s, String enc) throws UnsupportedEncodingException {
-            return URLEncoder.encode(s, enc).replace("%20", "+");
+            return URLEncoder.encode(s, enc).replace("+", "%20");
         }
 
         /**
@@ -315,7 +315,7 @@ public class DefaultDataUrlSerializer implements DataUrlSerializer {
          * supported
          */
         public static String decode(String s, String enc) throws UnsupportedEncodingException {
-            return URLDecoder.decode(s.replace("+", "%20"), enc);
+            return URLDecoder.decode(s.replace("%20", "+"), enc);
         }
 
     }

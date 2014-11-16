@@ -29,3 +29,24 @@ String serialized = "data:image/png;base64,...";
 DataUrl unserialized = serializer.unserialize(serialized);
 byte[] redDotData = unserialized.getData();
 ```
+
+## Maven
+``` xml
+<repository>
+    <id>dataurl-mvn-repo</id>
+    <url>https://raw.github.com/maxschuster/DataUrl/mvn-repo/</url>
+    <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+    </snapshots>
+</repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>eu.maxschuster</groupId>
+        <artifactId>dataurl</artifactId>
+        <version>0.1</version>
+    </dependency>
+</dependencies>
+```
