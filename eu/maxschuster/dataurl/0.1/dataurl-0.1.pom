@@ -4,7 +4,7 @@
     <groupId>eu.maxschuster</groupId>
     <artifactId>dataurl</artifactId>
     <version>0.1</version>
-    <packaging>jar</packaging>
+    <packaging>jar</packaging>  
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- ZIP Manifest fields -->
