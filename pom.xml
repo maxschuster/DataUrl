@@ -3,20 +3,32 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.maxschuster</groupId>
     <artifactId>dataurl</artifactId>
-    <version>0.1</version>
-    <packaging>jar</packaging>  
+    <version>1.0.0</version>
+    <packaging>bundle</packaging>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- ZIP Manifest fields -->
-        <Implementation-Version>${project.version}</Implementation-Version>
-        <!-- Must not change this because of the Directory -->
-        <Implementation-Title>${project.name}</Implementation-Title>
-        <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
-        
-        <!-- GitHub -->
-        <github.global.server>github</github.global.server>
     </properties>
+    
+    <organization>
+        <name>Max Schuster</name>
+        <url>https://github.com/maxschuster/DataUrl</url>
+    </organization>
+    
+    <scm>
+        <url>https://github.com/maxschuster/DataUrl.git</url>
+        <connection>scm:git:https://github.com/maxschuster/DataUrl.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:maxschuster/DataUrl.git</developerConnection>
+        <tag>DataUrl for Java</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/maxschuster/DataUrl/issues</url>
+    </issueManagement>
+    
     <name>DataUrl</name>
+    
     <licenses>
         <license>
             <name>Apache 2</name>
@@ -24,6 +36,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -32,6 +45,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
     <build>
         <plugins>
             <plugin>
@@ -97,40 +111,20 @@
                 <version>2.14.1</version>
             </plugin>
             
-            <!-- GitHub -->
             <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.1</version>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <version>2.5.3</version>
                 <configuration>
-                    <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+                    <instructions>
+                        <Export-Package>eu.maxschuster.dataurl</Export-Package>
+                        <Import-Package></Import-Package>
+                        <_noee>true</_noee>
+                    </instructions>
                 </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <version>0.10</version>
-                <configuration>
-                    <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-                    <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-                    <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                    <repositoryName>DataUrl</repositoryName>      <!-- github repo name -->
-                    <repositoryOwner>maxschuster</repositoryOwner>    <!-- github username  -->
-                </configuration>
-                <executions>
-                    <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
-                    <execution>
-                        <goals>
-                            <goal>site</goal>
-                        </goals>
-                        <phase>deploy</phase>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
+    
 </project>

@@ -15,32 +15,300 @@
  */
 package eu.maxschuster.dataurl;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * Used to serialize/unserialize {@link DataUrl}s
+ * 
  * @author Max Schuster
- * @see DefaultDataUrlSerializer
  */
-public interface DataUrlSerializer {
+public class DataUrlSerializer implements IDataUrlSerializer {
     
     /**
-     * Serializes the given {@link DataUrl} to a RFC 2397 data url string
-     * @param dataURL {@link DataUrl} to serialize
-     * @return A RFC 2397 data url {@link String}
-     * @throws MalformedURLException If the {@link DataUrl} could not be
-     * Serialized
+     * Pattern used to split header fields;
      */
-    public String serialize(DataUrl dataURL) throws MalformedURLException;
+    private final Pattern PATTERN_META_SPLIT = Pattern.compile(";");
     
     /**
-     * Unserializes the given RFC 2397 data url {@link String} to a
-     * {@link DataUrl} instance
-     * @param url A RFC 2397 data url {@link String} to unserialize
-     * @return {@link DataUrl}
-     * @throws MalformedURLException If the given RFC 2397 data url
-     * {@link String} is invalid
+     * Pattern used to check MIME-Types
      */
-    public DataUrl unserialize(String url) throws MalformedURLException;
+    private static final Pattern PATTERN_MIMETYPE
+            = Pattern.compile("^[a-z\\-0-9]+\\/[a-z\\-0-9]+$");
+    
+    /**
+     * IEncoder for {@link DataUrlEncoding#BASE64} encoded {@link DataUrl}s
+     */
+    private final Base64Encoder base64Encoder = new Base64Encoder();
+    
+    /**
+     * IEncoder for {@link DataUrlEncoding#URL} encoded {@link DataUrl}s
+     */
+    private final URLEncodedEncoder urlEncodedEncoder = new URLEncodedEncoder();
+
+    @Override
+    public String serialize(DataUrl dataURL) throws MalformedURLException {
+        DataUrlEncoding encoding = dataURL.getEncoding();
+        IEncoder encoder = getAppliedEncoder(encoding);
+        Map<String, String> headers = dataURL.getHeaders();
+        int headerSize = headers != null ? headers.size() : 0;
+        StringBuilder sb = new StringBuilder("data:");
+        String mimeType = dataURL.getMimeType();
+
+        if (mimeType != null) {
+            sb.append(mimeType);
+            if (headerSize > 0 || encoding != DataUrlEncoding.URL) {
+                sb.append(';');
+            }
+        }
+
+        if (headers != null && headerSize > 0) {
+            int i = 0;
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                String value;
+                try {
+                    value = URLEncoding.encode(entry.getValue(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new AssertionError();
+                }
+                sb.append(entry.getKey()).append('=').append(value);
+                i++;
+                if (i < headerSize || encoding != DataUrlEncoding.URL) {
+                    sb.append(';');
+                }
+            }
+        }
+        
+        String encodingName = encoding.getEncodingName();
+
+        if (!encodingName.isEmpty()) {
+            sb.append(encodingName);
+        }
+
+        sb.append(',');
+        
+        String appliedCharset = getAppliedCharset(headers);
+                
+        try {
+            sb.append(encoder.encode(appliedCharset, dataURL.getData()));
+        } catch (Exception e) {
+            throw new MalformedURLException("Error encoding the data");
+        }
+
+        return sb.toString();
+    }
+
+    @Override
+    public DataUrl unserialize(String urlString) throws MalformedURLException {
+        if (urlString == null) {
+            throw new NullPointerException();
+        }
+
+        byte[] data = null;
+        String mimeType = null;
+        HashMap<String, String> headers = new HashMap<String, String>();
+        
+
+        if (!urlString.startsWith("data:")) {
+            throw new MalformedURLException("Wrong protocol");
+        }
+
+        int colon = urlString.indexOf(':');
+        int comma = urlString.indexOf(',');
+
+        String metaString = urlString.substring(colon + 1, comma);
+        String dataString = urlString.substring(comma + 1);
+        String encodingName = "";
+
+        String[] metaArray = PATTERN_META_SPLIT.split(metaString);
+        for (int i = 0; i < metaArray.length; i++) {
+            String meta = metaArray[i];
+            if (i == 0) {
+                Matcher m = PATTERN_MIMETYPE.matcher(meta);
+                if (m.matches()) {
+                    mimeType = meta;
+                    continue;
+                }
+            }
+
+            if (i + 1 == metaArray.length) {
+                if (meta.indexOf('=') == -1) {
+                    encodingName = meta;
+                    continue;
+                }
+            }
+
+            int equals = meta.indexOf('=');
+            if (equals < 1) {
+                throw new MalformedURLException();
+            }
+
+            String name = meta.substring(0, equals);
+            String value = meta.substring(equals + 1);
+
+            try {
+                headers.put(name, URLEncoding.decode(value, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new AssertionError(e);
+            }
+        }
+        
+        DataUrlEncoding encoding;
+        try {
+            encoding = DataUrlEncoding.valueOfEncodingName(encodingName);
+        } catch (IllegalArgumentException e) {
+            throw new MalformedURLException("Unknown encoding \"" + encodingName
+                    + "\"");
+        }
+        IEncoder encoder = getAppliedEncoder(encoding);
+        String appliedCharset = getAppliedCharset(headers);
+        
+        try {
+            data = encoder.decode(appliedCharset, dataString);
+        } catch (Exception e) {
+            throw new MalformedURLException("");
+        }
+
+        DataUrl dataUrl = new DataUrl(data, encoding, mimeType, headers);
+
+        return dataUrl;
+    }
+    
+    /**
+     * Gets the charset that should be used to encode the {@link DataUrl}
+     * @param headers Headers map
+     * @return Applied charset, never {@code null}
+     */
+    protected String getAppliedCharset(Map<String, String> headers) {
+        String encoding;
+        if (headers != null && (encoding = headers.get("charset")) != null) {
+            return encoding;
+        }
+        return "US-ASCII"; 
+    }
+    
+    /**
+     * Get the matching encoder for the given encoding
+     * @param encoding Encoding
+     * @return Matching encoder
+     */
+    protected IEncoder getAppliedEncoder(DataUrlEncoding encoding) {
+        switch (encoding) {
+            case BASE64:
+                return base64Encoder;
+            case URL:
+                return urlEncodedEncoder;
+        }
+        throw new IllegalArgumentException();
+    }
+    
+    /**
+     * A encoder for {@link DataUrl}s
+     *
+     * @author Max Schuster
+     */
+    protected interface IEncoder {
+
+        /**
+         * Decodes the given {@link String}
+         *
+         * @param charset Charset
+         * @param string String to decode
+         * @return Decoded data
+         * @throws Exception If something goes wrong
+         */
+        public byte[] decode(String charset, String string) throws Exception;
+
+        /**
+         * Encodes the given byte[] of data
+         *
+         * @param charset Charset
+         * @param data String to encode
+         * @return Encoded String
+         * @throws Exception If something goes wrong
+         */
+        public String encode(String charset, byte[] data) throws Exception;
+
+    }
+
+    /**
+     * Base64 implementation of {@link IEncoder}
+     *
+     * @author Max Schuster
+     */
+    protected class Base64Encoder implements IEncoder {
+
+        @Override
+        public byte[] decode(String charset, String string) {
+            return DatatypeConverter.parseBase64Binary(string);
+        }
+
+        @Override
+        public String encode(String charset, byte[] data) {
+            return DatatypeConverter.printBase64Binary(data);
+        }
+
+    }
+
+    /**
+     * URL Encoded implemention of {@link IEncoder}
+     *
+     * @author Max Schuster
+     */
+    protected class URLEncodedEncoder implements IEncoder {
+
+        @Override
+        public byte[] decode(String charset, String string) throws Exception {
+            return URLEncoding.decode(string, charset).getBytes(charset);
+        }
+
+        @Override
+        public String encode(String charset, byte[] data) throws Exception {
+            return URLEncoding.encode(new String(data, charset), charset);
+        }
+
+    }
+
+    /**
+     * Encodes/Decodes a {@link String} RFC 3986 compatible
+     *
+     * @author Max Schuster
+     */
+    private static class URLEncoding {
+
+        /**
+         * Encodes a {@link String}
+         *
+         * @param s String to encode
+         * @param enc Encoding to use
+         * @return Encoded {@link String}
+         * @throws UnsupportedEncodingException If the named encoding is not
+         * supported
+         */
+        public static String encode(String s, String enc) throws UnsupportedEncodingException {
+            return URLEncoder.encode(s, enc).replace("+", "%20");
+        }
+
+        /**
+         * Decodes a {@link String}
+         *
+         * @param s String to decode
+         * @param enc Encoding to use
+         * @return Decoded {@link String}
+         * @throws UnsupportedEncodingException If the named encoding is not
+         * supported
+         */
+        public static String decode(String s, String enc) throws UnsupportedEncodingException {
+            return URLDecoder.decode(s.replace("%20", "+"), enc);
+        }
+
+    }
     
 }

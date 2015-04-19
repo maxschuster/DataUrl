@@ -47,7 +47,7 @@ public class DataUrlBuilder {
     /**
      * Creates a new {@link DataUrl} instance
      * @return New {@link DataUrl} instance
-     * @throws NullPointerException if data is <code>null</code>
+     * @throws NullPointerException if data or encoding is {@code null}
      */
     public DataUrl build() throws NullPointerException {
         if (data == null) {

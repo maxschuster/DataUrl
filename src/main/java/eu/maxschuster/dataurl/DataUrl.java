@@ -54,11 +54,11 @@ public final class DataUrl implements Serializable {
 
     /**
      * Consturcts a new DataUrl
-     * @param data Payload of this data url. Must not be <code>null</code>
-     * @param encoding Encoding method. Must not be <code>null</code>
+     * @param data Payload of this data url. Must not be {@code null}
+     * @param encoding Encoding method. Must not be {@code null}
      * @param mimeType MIME-Type of this data urls content
      * @param headers Headers/parameters of this data url
-     * @throws NullPointerException if data or encoding is <code>null</code>
+     * @throws NullPointerException if data or encoding is {@code null}
      */
     public DataUrl(byte[] data, DataUrlEncoding encoding, String mimeType,
             Map<String, String> headers) throws NullPointerException {
@@ -74,16 +74,16 @@ public final class DataUrl implements Serializable {
             this.headers = Collections.unmodifiableMap(
                     new LinkedHashMap<String, String>(headers));
         } else {
-            this.headers = null;
+            this.headers = Collections.emptyMap();
         }
     }
     
     /**
      * Consturcts a new DataUrl without headers/parameters
-     * @param data Payload of this data url. Must not be <code>null</code>
-     * @param encoding Encoding method. Must not be <code>null</code>
+     * @param data Payload of this data url. Must not be {@code null}
+     * @param encoding Encoding method. Must not be {@code null}
      * @param mimeType MIME-Type of this data urls content
-     * @throws NullPointerException if data or encoding is <code>null</code>
+     * @throws NullPointerException if data or encoding is {@code null}
      */
     public DataUrl(byte[] data, DataUrlEncoding encoding, String mimeType) 
             throws NullPointerException {
@@ -92,9 +92,9 @@ public final class DataUrl implements Serializable {
     
     /**
      * Consturcts a new DataUrl without headers/parameters and MIME-Type
-     * @param data Payload of this data url. Must not be <code>null</code>
-     * @param encoding Encoding method. Must not be <code>null</code>
-     * @throws NullPointerException if data or encoding is <code>null</code>
+     * @param data Payload of this data url. Must not be {@code null}
+     * @param encoding Encoding method. Must not be {@code null}
+     * @throws NullPointerException if data or encoding is {@code null}
      */
     public DataUrl(byte[] data, DataUrlEncoding encoding) 
             throws NullPointerException {
@@ -104,8 +104,8 @@ public final class DataUrl implements Serializable {
     /**
      * Consturcts a new DataUrl with URL encoding and without
      * headers/parameters and MIME-Type
-     * @param data Payload of this data url. Must not be <code>null</code>
-     * @throws NullPointerException if data is <code>null</code>
+     * @param data Payload of this data url. Must not be {@code null}
+     * @throws NullPointerException if data is {@code null}
      */
     public DataUrl(byte[] data) 
             throws NullPointerException {
@@ -122,7 +122,7 @@ public final class DataUrl implements Serializable {
 
     /**
      * Gets the MIME-Type of this data urls content.
-     * @return MIME-Type of this data urls content or <code>null</code>.
+     * @return MIME-Type of this data urls content or {@code null}.
      */
     public String getMimeType() {
         return mimeType;
@@ -138,7 +138,7 @@ public final class DataUrl implements Serializable {
 
     /**
      * Gets the headers/parameters of this data url
-     * @return Headers/parameters of this data url or <code>null</code>
+     * @return Headers/parameters of this data url or {@code null}
      */
     public Map<String, String> getHeaders() {
         return headers;
