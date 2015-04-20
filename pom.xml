@@ -16,7 +16,7 @@
     </organization>
     
     <scm>
-        <url>https://github.com/maxschuster/DataUrl.git</url>
+        <url>https://github.com/maxschuster/DataUrl</url>
         <connection>scm:git:https://github.com/maxschuster/DataUrl.git</connection>
         <developerConnection>scm:git:ssh://git@github.com:maxschuster/DataUrl.git</developerConnection>
         <tag>DataUrl for Java</tag>
