@@ -26,3 +26,12 @@ String serialized = "data:image/png;base64,...";
 DataUrl unserialized = serializer.unserialize(serialized);
 byte[] redDotData = unserialized.getData();
 ```
+
+## Maven
+``` xml
+<dependency>
+    <groupId>eu.maxschuster</groupId>
+    <artifactId>dataurl</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
