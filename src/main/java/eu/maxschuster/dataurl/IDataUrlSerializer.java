@@ -15,6 +15,7 @@
  */
 package eu.maxschuster.dataurl;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 
 /**
@@ -22,7 +23,7 @@ import java.net.MalformedURLException;
  * RFC 2397 data urls.
  * @author Max Schuster
  */
-public interface IDataUrlSerializer {
+public interface IDataUrlSerializer extends Serializable {
     
     /**
      * Serialize the given {@link DataUrl} to an RFC 2397 data url 

@@ -15,6 +15,7 @@
  */
 package eu.maxschuster.dataurl;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
@@ -31,6 +32,8 @@ import javax.xml.bind.DatatypeConverter;
  * @author Max Schuster
  */
 public class DataUrlSerializer implements IDataUrlSerializer {
+
+    private static final long serialVersionUID = 1L;
     
     /**
      * Pattern used to split header fields;
@@ -214,7 +217,7 @@ public class DataUrlSerializer implements IDataUrlSerializer {
      *
      * @author Max Schuster
      */
-    protected interface IEncoder {
+    protected interface IEncoder extends Serializable {
 
         /**
          * Decodes the given {@link String}
@@ -245,6 +248,8 @@ public class DataUrlSerializer implements IDataUrlSerializer {
      */
     protected class Base64Encoder implements IEncoder {
 
+        private static final long serialVersionUID = 1L;
+
         @Override
         public byte[] decode(String charset, String string) {
             return DatatypeConverter.parseBase64Binary(string);
@@ -263,6 +268,8 @@ public class DataUrlSerializer implements IDataUrlSerializer {
      * @author Max Schuster
      */
     protected class URLEncodedEncoder implements IEncoder {
+
+        private static final long serialVersionUID = 1L;
 
         @Override
         public byte[] decode(String charset, String string) throws Exception {

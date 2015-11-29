@@ -15,6 +15,7 @@
  */
 package eu.maxschuster.dataurl;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +23,9 @@ import java.util.Map;
  * Builder to ceate {@link DataUrl} instances
  * @author Max Schuster
  */
-public class DataUrlBuilder {
+public class DataUrlBuilder implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     
     /**
      * Payload of this data url
