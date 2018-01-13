@@ -141,7 +141,7 @@ public class DataUrlBuilder implements Serializable {
      */
     public DataUrlBuilder setHeader(String name, String value) {
         if (headers == null) {
-            headers = new HashMap<String, String>();
+            headers = new HashMap<>();
         }
         headers.put(name, value);
         return this;

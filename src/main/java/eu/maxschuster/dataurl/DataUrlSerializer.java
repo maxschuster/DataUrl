@@ -20,11 +20,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.xml.bind.DatatypeConverter;
 
 /**
  * Used to serialize/unserialize {@link DataUrl}s
@@ -116,7 +116,7 @@ public class DataUrlSerializer implements IDataUrlSerializer {
 
         byte[] data = null;
         String mimeType = null;
-        HashMap<String, String> headers = new HashMap<String, String>();
+        HashMap<String, String> headers = new HashMap<>();
         
 
         if (!urlString.startsWith("data:")) {
@@ -252,12 +252,12 @@ public class DataUrlSerializer implements IDataUrlSerializer {
 
         @Override
         public byte[] decode(String charset, String string) {
-            return DatatypeConverter.parseBase64Binary(string);
+            return Base64.getDecoder().decode(string);
         }
 
         @Override
         public String encode(String charset, byte[] data) {
-            return DatatypeConverter.printBase64Binary(data);
+            return new String(Base64.getEncoder().encode(data));
         }
 
     }

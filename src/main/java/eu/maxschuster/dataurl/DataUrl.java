@@ -72,7 +72,7 @@ public final class DataUrl implements Serializable {
         this.mimeType = mimeType;
         if (headers != null) {
             this.headers = Collections.unmodifiableMap(
-                    new LinkedHashMap<String, String>(headers));
+                    new LinkedHashMap<>(headers));
         } else {
             this.headers = Collections.emptyMap();
         }
