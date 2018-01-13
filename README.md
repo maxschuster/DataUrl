@@ -2,6 +2,8 @@ DataUrl
 ==============
 A java library to create and parse RFC 2397 data urls.
 
+[![Javadocs](https://www.javadoc.io/badge/eu.maxschuster/dataurl.svg)](https://www.javadoc.io/doc/eu.maxschuster/dataurl)
+
 ## Licence
 Apache 2.0
 
