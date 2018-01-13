@@ -5,6 +5,9 @@ A java library to create and parse RFC 2397 data urls.
 ## Licence
 Apache 2.0
 
+## Requirements
+Requires java 8
+
 ## Usage
 ### Create/Serialize
 ``` java
@@ -32,6 +35,6 @@ byte[] redDotData = unserialized.getData();
 <dependency>
     <groupId>eu.maxschuster</groupId>
     <artifactId>dataurl</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
