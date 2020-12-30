@@ -19,6 +19,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 import org.junit.Test;
@@ -39,11 +41,20 @@ public class Base64EncodingTest {
     
     private final String checkedTextData;
 
+    private final byte[] sampleBinaryData;
+
+    private final String sampleWpsTextData;
+
+    private final String sampleMswordTextData;
+
     public Base64EncodingTest() throws IOException {
         this.reddotBinaryData = loadBinaryData("reddot.png");
         this.reddotTextData = loadTextData("reddot.txt");
         this.checkedBinaryData = loadBinaryData("checked.png");
         this.checkedTextData = loadTextData("checked.txt");
+        this.sampleBinaryData = loadBinaryData("sample.docx");
+        this.sampleWpsTextData = loadTextData("sample-wps.txt");
+        this.sampleMswordTextData = loadTextData("sample-msword.txt");
     }
     
     private byte[] loadBinaryData(String name) throws IOException {
@@ -59,9 +70,46 @@ public class Base64EncodingTest {
     
     private String loadTextData(String name) throws IOException {
         byte[] data =  loadBinaryData(name);
-        return new String(data, "UTF-8");
+        return new String(data, StandardCharsets.UTF_8);
     }
-    
+
+    @Test
+    public void sampleWpsSerialize() throws MalformedURLException {
+        DataUrl dataUrl = new DataUrlBuilder()
+                .setEncoding(DataUrlEncoding.BASE64)
+                .setData(sampleBinaryData)
+                .setMimeType("application/wps-office.docx")
+                .setHeader("name", "这个是测试docx文件.docx")
+                .build();
+        String serialized = serializer.serialize(dataUrl);
+        assertEquals(sampleWpsTextData, serialized);
+    }
+
+    @Test
+    public void sampleWpsUnserialize() throws MalformedURLException {
+        DataUrl unserialized = serializer.unserialize(sampleWpsTextData);
+        assertArrayEquals(sampleBinaryData, unserialized.getData());
+    }
+
+    @Test
+    public void sampleMswordSerialize() throws MalformedURLException {
+        DataUrl dataUrl = new DataUrlBuilder()
+                .setEncoding(DataUrlEncoding.BASE64)
+                .setData(sampleBinaryData)
+                .setMimeType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                .setHeader("name", "这个是测试docx文件.docx")
+                .build();
+        String serialized = serializer.serialize(dataUrl);
+        System.out.println("serllll:" + serialized);
+        assertEquals(sampleMswordTextData, serialized);
+    }
+
+    @Test
+    public void sampleMswordUnserialize() throws MalformedURLException {
+        DataUrl unserialized = serializer.unserialize(sampleMswordTextData);
+        assertArrayEquals(sampleBinaryData, unserialized.getData());
+    }
+
     @Test
     public void reddotSerialize() throws MalformedURLException {
         DataUrl dataUrl = new DataUrlBuilder()
