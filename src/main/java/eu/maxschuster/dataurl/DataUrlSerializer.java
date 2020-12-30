@@ -44,7 +44,7 @@ public class DataUrlSerializer implements IDataUrlSerializer {
      * Pattern used to check MIME-Types
      */
     private static final Pattern PATTERN_MIMETYPE
-            = Pattern.compile("^[a-z\\-0-9]+\\/[a-z\\-0-9]+$");
+            = Pattern.compile("^[a-z\\-0-9]+\\/[a-z\\-\\.\\+0-9]+$");
     
     /**
      * IEncoder for {@link DataUrlEncoding#BASE64} encoded {@link DataUrl}s
